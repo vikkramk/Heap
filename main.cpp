@@ -10,16 +10,17 @@
 #include <cmath>
 #include <string>
 
-void print(int tree[]) {
+void print(int tree[], int len) {
   int level = 0;
   int nextbreak = 1;
-  for (int i = 1; i < 101 && tree[i] != 0; i++) {
-    std::cout << tree[i] << std::flush;
-	if (i == nextbreak) {
-		std::cout << std::endl;
-		nextbreak += pow(2, ++level);
-	}
+  for (int i = 1; i < 101 && i <= len; i++) {
+    std::cout << tree[i] << " " << std::flush;
+  	if (i == nextbreak) {
+  		std::cout << std::endl;
+  		nextbreak += pow(2, ++level);
+  	}
   }
+  std::cout << std::endl;
 }
 
 int main (int argc, char* argv[]) {
@@ -31,7 +32,7 @@ int main (int argc, char* argv[]) {
     std::cout << "Enter integers separated by newlines. q to finish" << std::endl;
 
     bool finished = false;
-    int i = 0;
+    int i = 1;
     while (!finished) {
       int num;
       std::cin >> num;
@@ -39,21 +40,24 @@ int main (int argc, char* argv[]) {
 				finished = true;
 				std::cin.clear();
 			}
+      else {
+        nums[i] = num;
+      }
 			i++;
-			if (i = 102) {
+			if (i > 101) {
 				finished = true;
 			}
     }
 		len = i-2;
+
   }
 
   if (argc == 2) {  //File input
     std::ifstream numfile;
 
-    try {
-      numfile.open(argv[1]);
-    } catch (const std::exception &) {
-      std::cout << "Use: " << argv[0] << " <filepath>" << std::endl;
+    numfile.open(argv[1]);
+    if (!numfile.good()) {
+      std::cout << "Useage: " << argv[0] << " <filepath>" << std::endl;
       return 1;
     }
 
@@ -62,12 +66,15 @@ int main (int argc, char* argv[]) {
     while (!finished) {
       int num;
       numfile >> num;
-			if (std::cin.fail()) {
+			if (numfile.fail()) {
 				finished = true;
-				std::cin.clear();
+				numfile.clear();
 			}
+      else {
+        nums[i] = num;
+      }
 			i++;
-			if (i = 102) {
+			if (i > 101) {
 				finished = true;
 			}
     }
@@ -75,36 +82,39 @@ int main (int argc, char* argv[]) {
   }
 
   if (argc > 2) { //Improperly called
-    std::cout << "Use: " << argv[0] << " <filepath>" << std::endl;
+    std::cout << "Useage: " << argv[0] << " <filepath>" << std::endl;
   }
 
   /*Fill the tree with input*/
-  for (int i = 1; i <= len+1; i++) {	//For each number
+  for (int i = 1; i <= len; i++) {	//For each number
     int n = i;	//The current location of the newest number
-	tree[i] = nums[i];	//Add to end
-	while (n!=1 && tree[n] > tree[n/2]) {	//Percolate up
-	  int temp = tree[n/2];
-	  tree[n/2] = tree[n];
-	  tree[n] = temp;
-	  n /= 2;
-	}
+  	tree[i] = nums[i];	//Add to end
+  	while (n!=1 && tree[n] > tree[n/2]) {	//Percolate up
+  	  int temp = tree[n/2];
+  	  tree[n/2] = tree[n];
+  	  tree[n] = temp;
+  	  n /= 2;
+  	}
   }
-  
-  print(tree);  //Print the complete tree
-  
+
+  std::cout << "*********Tree Representation*********" << std::endl;
+  print(tree, len);  //Print the complete tree
+
+  std::cout << "*********Sorted Numbers**********" << std::endl;
   /*Print out the tree max to min*/
-  for (int i = 0; i < len-1; i++) {	//For each number, exept last
-    std::cout << tree[1] << std::endl;
-		int n = 1;	//Location of number being percolated (the one that used to be last)
-		tree[n] = tree[len-i+1];	//Set root to last
-		bool finished = false;
+  while (len != 0) {
+    std::cout << tree[1] << std::endl; //Print the root (max)
+    tree[1] = tree[len+1];  //Set the root to the last
+    len--;
+    int n = 1;  //Location of element being resetled
+    bool finished = false;
 		while (!finished) {
 			int rightmore = 0, leftmore = 0;
 			if (2*n <= len)
 				leftmore = tree[2*n] - tree[n];
 			if (2*n+1 <= len)
 				rightmore = tree[2*n+1] - tree[n];
-			
+
 			if (rightmore || leftmore) {
 				int child = rightmore > leftmore;
 				int temp = tree[2*n+child];
@@ -115,6 +125,5 @@ int main (int argc, char* argv[]) {
 			else
 				finished = true;
 		}
-		std::cout << tree[i] << std::endl;	//Print last one
-	}
+  }
 }
