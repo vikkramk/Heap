@@ -102,12 +102,14 @@ int main (int argc, char* argv[]) {
 
   std::cout << "*********Sorted Numbers**********" << std::endl;
   /*Print out the tree max to min*/
-  while (len != 0) {
+  while (len > 0) {	//While there are elements in the tree
     std::cout << tree[1] << std::endl; //Print the root (max)
-    tree[1] = tree[len+1];  //Set the root to the last
-    len--;
-    int n = 1;  //Location of element being resetled
+    tree[1] = tree[len];  //Set the root to the last
+		//std::cout << "+++++++++++++++" << tree[len] << "+++++++++++++++++++" << std::endl;
+    len--;	//Decrease lenght to remove last element
+    int n = 1;  //Location of element being resettled
     bool finished = false;
+		//print(tree, len);
 		while (!finished) {
 			int rightmore = 0, leftmore = 0;
 			if (2*n <= len)
@@ -115,7 +117,7 @@ int main (int argc, char* argv[]) {
 			if (2*n+1 <= len)
 				rightmore = tree[2*n+1] - tree[n];
 
-			if (rightmore || leftmore) {
+			if (rightmore>0 || leftmore>0) {
 				int child = rightmore > leftmore;
 				int temp = tree[2*n+child];
 				tree[2*n+child] = tree[n];
@@ -124,6 +126,8 @@ int main (int argc, char* argv[]) {
 			}
 			else
 				finished = true;
+			//std::cout << "****************" << len << "*****************" << std::endl;
+			//print(tree, len);
 		}
   }
 }
